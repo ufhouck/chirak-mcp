@@ -1,0 +1,46 @@
+{
+  "name": "chirak-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) Server for Chirak Sales & Inventory Assistant",
+  "main": "dist/index.js",
+  "bin": {
+    "chirak-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "smithery.yaml"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ufhouck/chirak-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ufhouck/chirak-mcp/issues"
+  },
+  "keywords": [
+    "chirak",
+    "mcp",
+    "model-context-protocol",
+    "inventory",
+    "sales",
+    "claude-desktop",
+    "cursor",
+    "retail",
+    "erp"
+  ],
+  "author": "Ufuk AYDIN",
+  "license": "MIT",
+  "homepage": "https://chirak.app/docs",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "typescript": "^5.7.3"
+  }
+}
