@@ -1,6 +1,6 @@
 # Chirak MCP Server
 
-[![smithery badge](https://smithery.ai/badge/ufhouck/chirak)](https://smithery.ai/servers/ufhouck/chirak)
+[![Smithery](https://img.shields.io/badge/Smithery-ufhouck%2Fchirak-blue)](https://smithery.ai/servers/ufhouck/chirak)
 [![npm version](https://img.shields.io/npm/v/chirak-mcp.svg)](https://www.npmjs.com/package/chirak-mcp)
 
 A Model Context Protocol (MCP) server that connects AI clients (Claude Desktop, Cursor, Windsurf) to the Chirak Sales, Inventory, and Order Management API.
