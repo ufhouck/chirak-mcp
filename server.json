@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.ufhouck/chirak-mcp",
+  "description": "Model Context Protocol (MCP) Server for Chirak Sales & Inventory Assistant",
+  "repository": {
+    "url": "https://github.com/ufhouck/chirak-mcp",
+    "source": "github"
+  },
+  "version": "1.1.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "chirak-mcp",
+      "version": "1.1.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CHIRAK_API_KEY",
+          "description": "Your Chirak API Key starting with chk_live_ (generated from Chirak App -> More -> Integrations & AI)",
+          "format": "string",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "CHIRAK_API_BASE_URL",
+          "description": "Chirak Cloud API Endpoint (optional, defaults to https://chirak.app/api/v1)",
+          "format": "string",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

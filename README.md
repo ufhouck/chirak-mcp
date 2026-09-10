@@ -2,6 +2,8 @@
 
 [![Smithery](https://img.shields.io/badge/Smithery-ufhouck%2Fchirak-blue)](https://smithery.ai/servers/ufhouck/chirak)
 [![npm version](https://img.shields.io/npm/v/chirak-mcp.svg)](https://www.npmjs.com/package/chirak-mcp)
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-io.github.ufhouck%2Fchirak--mcp-purple)](https://registry.modelcontextprotocol.io)
+[![Glama](https://img.shields.io/badge/Glama-Chirak-emerald)](https://glama.ai/mcp/servers)
 
 A Model Context Protocol (MCP) server that connects AI clients (Claude Desktop, Cursor, Windsurf) to the Chirak Sales, Inventory, and Order Management API.
 
@@ -123,12 +125,15 @@ node dist/index.js
 - API credentials are authenticated server-side using SHA-256 hash matching.
 - Requests operate strictly within isolated tenant database partitions.
 
-## Links
-
-- Website: [https://chirak.app](https://chirak.app)
-- Documentation: [https://chirak.app/docs](https://chirak.app/docs)
-- Privacy Policy: [https://chirak.app/privacy](https://chirak.app/privacy)
+## Privacy Policy
+ 
+Chirak values developer and user privacy. When interacting with this MCP server:
+- All data transmission between AI clients and Chirak Cloud API is encrypted in transit using TLS.
+- Store database partitions are strictly multi-tenant isolated by tenant ID.
+- API keys are verified server-side using SHA-256 hashes and are never stored in plain text.
+- Full Privacy Policy documentation: [https://chirak.app/privacy](https://chirak.app/privacy)
 
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
