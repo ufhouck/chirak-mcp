@@ -56,7 +56,7 @@ npx -y smithery mcp add ufhouck/chirak
 | Variable | Required | Description |
 |---|---|---|
 | `CHIRAK_API_KEY` | Yes | Authentication key for Chirak Cloud API (`chk_live_...`). |
-| `CHIRAK_API_BASE_URL` | No | Target API endpoint (default: `https://europe-west1-chirak-app.cloudfunctions.net/api/v1`). |
+| `CHIRAK_API_BASE_URL` | No | Target API endpoint (default: `https://chirak.app/api/v1`). |
 
 ## Tools
 
