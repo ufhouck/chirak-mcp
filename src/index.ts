@@ -10,18 +10,21 @@ import {
 const API_KEY = process.env.CHIRAK_API_KEY;
 const API_BASE_URL = (process.env.CHIRAK_API_BASE_URL || "https://chirak.app/api/v1").replace(/\/$/, "");
 
-if (!API_KEY) {
-  console.error("Error: CHIRAK_API_KEY environment variable is required to run chirak-mcp.");
-  console.error("Please configure your API key in Claude Desktop or pass it via environment variables.");
-  process.exit(1);
-}
+// Runtime API key validation is handled in apiRequest to allow introspection (tools/list) without prior config
 
 // HTTP Helper
 async function apiRequest(endpoint: string, options: RequestInit = {}) {
-  const url = `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+  const currentKey = process.env.CHIRAK_API_KEY || API_KEY;
+  if (!currentKey) {
+    throw new Error(
+      "CHIRAK_API_KEY is not configured. Please supply your Chirak API key (starting with chk_live_) via environment variables or client settings."
+    );
+  }
+  const currentBaseUrl = (process.env.CHIRAK_API_BASE_URL || API_BASE_URL).replace(/\/$/, "");
+  const url = `${currentBaseUrl}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
   const headers: Record<string, string> = {
-    "X-API-Key": API_KEY as string,
-    "Authorization": `ApiKey ${API_KEY}`,
+    "X-API-Key": currentKey,
+    "Authorization": `ApiKey ${currentKey}`,
     "Content-Type": "application/json",
     ...((options.headers as Record<string, string>) || {})
   };
@@ -50,6 +53,16 @@ const TOOLS: Tool[] = [
           description: "Optional specific topic to focus on: 'products', 'sales', 'customers', 'reports', or 'general'."
         }
       }
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -62,6 +75,16 @@ const TOOLS: Tool[] = [
           type: "string",
           description: "Optional specific topic: 'products', 'sales', 'customers', 'reports', or 'general'."
         }
+      }
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
       }
     }
   },
@@ -84,6 +107,16 @@ const TOOLS: Tool[] = [
           description: "Maximum number of products to return (default: 50, max: 100)."
         }
       }
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -98,6 +131,16 @@ const TOOLS: Tool[] = [
         }
       },
       required: ["query"]
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -148,6 +191,17 @@ const TOOLS: Tool[] = [
         }
       },
       required: ["name", "sellingPrice"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -171,6 +225,17 @@ const TOOLS: Tool[] = [
         unit: { type: "string", description: "Updated unit type (e.g. 'Adet', 'Kg')." }
       },
       required: ["id"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -197,6 +262,17 @@ const TOOLS: Tool[] = [
         }
       },
       required: ["id", "quantityChange"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -211,6 +287,17 @@ const TOOLS: Tool[] = [
         }
       },
       required: ["id"]
+    },
+    annotations: {
+      destructiveHint: true,
+      readOnlyHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -256,6 +343,17 @@ const TOOLS: Tool[] = [
         }
       },
       required: ["items"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -270,6 +368,17 @@ const TOOLS: Tool[] = [
         }
       },
       required: ["id"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -283,6 +392,16 @@ const TOOLS: Tool[] = [
           enum: ["today", "this_week", "this_month"],
           description: "Time range for the sales report (default: 'today')."
         }
+      }
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
       }
     }
   },
@@ -301,6 +420,16 @@ const TOOLS: Tool[] = [
           description: "Max customers to return (default: 50)."
         }
       }
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -318,6 +447,17 @@ const TOOLS: Tool[] = [
         notes: { type: "string", description: "VIP notes or customer preferences." }
       },
       required: ["name"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -336,6 +476,17 @@ const TOOLS: Tool[] = [
         notes: { type: "string", description: "Updated notes." }
       },
       required: ["id"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      idempotentHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   },
   {
@@ -347,6 +498,17 @@ const TOOLS: Tool[] = [
         id: { type: "string", description: "Customer UUID to delete (required)." }
       },
       required: ["id"]
+    },
+    annotations: {
+      destructiveHint: true,
+      readOnlyHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
     }
   }
 ];

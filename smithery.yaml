@@ -10,14 +10,20 @@ startCommand:
     properties:
       apiKey:
         type: string
-        description: "Your Chirak API Key (starts with chk_live_)"
+        description: "Your Chirak API Key starting with chk_live_ (generated in Chirak App -> Settings -> Integrations & AI)"
+      apiBaseUrl:
+        type: string
+        description: "Chirak API base URL (optional, defaults to production)"
+        default: "https://chirak.app/api/v1"
   commandFunction: |-
     (config) => ({
       command: 'npx',
       args: ['-y', 'chirak-mcp'],
       env: {
-        CHIRAK_API_KEY: config.apiKey
+        CHIRAK_API_KEY: config.apiKey,
+        CHIRAK_API_BASE_URL: config.apiBaseUrl || 'https://chirak.app/api/v1'
       }
     })
   exampleConfig:
     apiKey: "chk_live_YOUR_API_KEY_HERE"
+    apiBaseUrl: "https://chirak.app/api/v1"

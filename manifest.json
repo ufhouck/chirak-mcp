@@ -1,0 +1,56 @@
+{
+  "manifest_version": "0.3",
+  "name": "chirak-mcp",
+  "display_name": "Chirak Sales & Inventory Assistant",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for Chirak Sales, Inventory, and Order Management platform.",
+  "long_description": "Connect AI assistants and autonomous agents to Chirak. Query real-time inventory levels, record sales transactions, manage products and customers, and access revenue analytics via standard Model Context Protocol over STDIO.",
+  "author": {
+    "name": "Ufuk AYDIN",
+    "email": "ufuk@ufukaydin.com",
+    "url": "https://chirak.app"
+  },
+  "homepage": "https://chirak.app",
+  "documentation": "https://chirak.app/docs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ufhouck/chirak-mcp.git"
+  },
+  "icon": "icon.png",
+  "icons": [
+    {
+      "src": "icon.png",
+      "size": "512x512"
+    }
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/dist/index.js"
+      ],
+      "env": {
+        "CHIRAK_API_KEY": "${user_config.api_key}",
+        "CHIRAK_API_BASE_URL": "${user_config.api_base_url}"
+      }
+    }
+  },
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "Chirak API Key",
+      "description": "Your Chirak API Key starting with chk_live_ (generated from Chirak App -> More -> Integrations & AI)",
+      "sensitive": true,
+      "required": true
+    },
+    "api_base_url": {
+      "type": "string",
+      "title": "API Base URL",
+      "description": "Chirak Cloud API Endpoint (defaults to production)",
+      "default": "https://chirak.app/api/v1",
+      "required": false
+    }
+  }
+}

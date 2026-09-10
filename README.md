@@ -1,34 +1,21 @@
-# Chirak MCP Server (`chirak-mcp`)
+# Chirak MCP Server
 
-Official **Model Context Protocol (MCP)** server for **Chirak** — The modern Sales, Inventory & Order Management platform.
+A Model Context Protocol (MCP) server that connects AI clients (Claude Desktop, Cursor, Windsurf) to the Chirak Sales, Inventory, and Order Management API.
 
-Connect your retail store, boutique, or multi-channel business directly to leading AI assistants like **Claude Desktop**, **Cursor**, **Windsurf**, **Claude Code**, and **Gemini**.
+## Overview
 
-- 🌐 **Website:** [chirak.app](https://chirak.app)
-- 📖 **Documentation:** [chirak.app/docs](https://chirak.app/docs)
-- 📱 **App Store:** [Download Chirak on iOS & iPadOS](https://apps.apple.com/app/chirak-sales-inventory/id6801464820)
+The Chirak MCP server enables Large Language Model (LLM) interfaces to perform real-time inventory lookups, record sales transactions, manage product records, and query business analytics via standard Model Context Protocol tooling over STDIO.
 
----
+## Prerequisites
 
-## Features
+- Node.js 18.0.0 or higher
+- A Chirak API key (generated from the Chirak iOS/iPadOS application under Settings > Integrations & AI)
 
-- 📦 **Live Inventory Queries:** Query real-time product quantities, low-stock warnings, and category stock lists.
-- 🏷️ **Product Management:** Add new products, update selling/buying prices, and barcodes.
-- ⚡ **Wholesale Invoice Parsing:** Let your AI vision models read supplier invoices and bulk-add inventory.
-- 🧾 **Order & Sales Recording:** Register walk-in sales, WhatsApp/Instagram orders, and delivery statuses.
-- 📊 **Executive Analytics:** Get instant daily/weekly summaries on revenue, net profit, and top-selling items.
-- 👥 **Customer Directory:** Query customer balances, contact details, and transaction history.
-- 🔒 **End-to-End Security:** API keys are hashed via SHA-256 with tenant-level isolation and strict permission scopes.
+## Installation and Configuration
 
----
+### Claude Desktop
 
-## Quickstart
-
-### 1. Generate Your API Key
-In the Chirak iOS/iPadOS app, open **More** (Daha Fazla) → **Integrations & AI** (Entegrasyonlar & AI) → tap **Create API Key**.
-
-### 2. Configure Claude Desktop
-Add the following to your `claude_desktop_config.json` file:
+Add the following configuration to your `claude_desktop_config.json`:
 
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
@@ -40,51 +27,97 @@ Add the following to your `claude_desktop_config.json` file:
       "command": "npx",
       "args": ["-y", "chirak-mcp"],
       "env": {
-        "CHIRAK_API_KEY": "chk_live_YOUR_API_KEY_HERE"
+        "CHIRAK_API_KEY": "your_api_key_here"
       }
     }
   }
 }
 ```
 
-### 3. Configure Cursor AI / Windsurf
-In **Cursor Settings** → **Features** → **MCP** → **Add New MCP Server**:
-- **Name:** `chirak`
-- **Type:** `command`
-- **Command:** `npx -y chirak-mcp`
-- **Environment Variables:** `CHIRAK_API_KEY=chk_live_YOUR_API_KEY_HERE`
+### Cursor and Windsurf
 
----
+Configure the MCP server within your editor's MCP settings:
 
-## Available MCP Tools
+- **Command:** `npx`
+- **Arguments:** `-y chirak-mcp`
+- **Environment Variables:**
+  - `CHIRAK_API_KEY`: `your_api_key_here`
+
+### Smithery
+
+To install via Smithery CLI:
+
+```bash
+npx -y smithery mcp add ufhouck/chirak
+```
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `CHIRAK_API_KEY` | Yes | Authentication key for Chirak Cloud API (`chk_live_...`). |
+| `CHIRAK_API_BASE_URL` | No | Target API endpoint (default: `https://europe-west1-chirak-app.cloudfunctions.net/api/v1`). |
+
+## Tools
+
+### Inventory and Products
 
 | Tool | Description |
-|------|-------------|
-| `get_products` | Retrieve products with optional filters (category, low stock, search). |
-| `add_product` | Add a new product to inventory with prices, stock, and barcode. |
-| `update_stock` | Adjust stock quantity with movement reasons (in, out, count, loss). |
-| `update_product` | Update product details (name, price, category, unit). |
-| `delete_product` | Delete a product from inventory (requires full access). |
-| `get_sales` | Retrieve recent sales and orders with customer details. |
-| `record_sale` | Record a new sale with line items, payments, and customer link. |
-| `cancel_sale` | Cancel a sale and automatically restore stock levels. |
-| `get_daily_summary`| Fetch daily turnover, profit, transaction count, and top items. |
-| `get_customers` | List customers with contact info and outstanding debt. |
-| `add_customer` | Create a new customer record. |
-| `update_customer` | Update existing customer details. |
+|---|---|
+| `get_products` | List and search inventory items with optional filters by category, stock level, or query string. |
+| `add_product` | Create a new product entry with SKU, name, prices, barcode, and initial stock. |
+| `update_stock` | Adjust inventory counts with specified movement type (inbound, outbound, audit, loss). |
+| `update_product` | Modify existing product attributes such as title, price, or category. |
+| `delete_product` | Remove an inventory item record. |
+
+### Sales and Orders
+
+| Tool | Description |
+|---|---|
+| `get_sales` | Retrieve recent orders and sales records filtered by date or status. |
+| `record_sale` | Create a sales transaction with line items, applied payment methods, and customer association. |
+| `cancel_sale` | Void a sales transaction and automatically return items to inventory. |
+| `get_daily_summary` | Retrieve daily aggregated metrics including total revenue, profit, transaction count, and top-selling products. |
+
+### Customer Management
+
+| Tool | Description |
+|---|---|
+| `get_customers` | Query customer records, outstanding balances, and purchase summaries. |
+| `add_customer` | Create a new customer profile. |
+| `update_customer` | Update contact information and customer notes. |
 | `delete_customer` | Remove a customer record. |
 
----
+## Development
 
-## Security & Privacy
+Clone the repository and install dependencies:
 
-- All communication between `chirak-mcp` and Chirak's Cloud API is encrypted via **HTTPS/TLS**.
-- API keys are authenticated server-side using cryptographic SHA-256 hashes.
-- Your store data is strictly isolated to your authenticated tenant account.
-- For more details, visit our [Privacy Policy](https://chirak.app/privacy) and [Terms of Service](https://chirak.app/terms).
+```bash
+git clone https://github.com/ufhouck/chirak-mcp.git
+cd chirak-mcp
+npm install
+npm run build
+```
 
----
+To run locally using STDIO:
+
+```bash
+export CHIRAK_API_KEY="your_api_key_here"
+node dist/index.js
+```
+
+## Security
+
+- All API communications are conducted over TLS (HTTPS).
+- API credentials are authenticated server-side using SHA-256 hash matching.
+- Requests operate strictly within isolated tenant database partitions.
+
+## Links
+
+- Website: [https://chirak.app](https://chirak.app)
+- Documentation: [https://chirak.app/docs](https://chirak.app/docs)
+- Privacy Policy: [https://chirak.app/privacy](https://chirak.app/privacy)
 
 ## License
 
-MIT License © 2026 Ufuk AYDIN
+MIT License. See [LICENSE](LICENSE) for details.
