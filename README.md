@@ -1,5 +1,8 @@
 # Chirak MCP Server
 
+[![smithery badge](https://smithery.ai/badge/ufhouck/chirak)](https://smithery.ai/servers/ufhouck/chirak)
+[![npm version](https://img.shields.io/npm/v/chirak-mcp.svg)](https://www.npmjs.com/package/chirak-mcp)
+
 A Model Context Protocol (MCP) server that connects AI clients (Claude Desktop, Cursor, Windsurf) to the Chirak Sales, Inventory, and Order Management API.
 
 ## Overview
@@ -13,7 +16,15 @@ The Chirak MCP server enables Large Language Model (LLM) interfaces to perform r
 
 ## Installation and Configuration
 
-### Claude Desktop
+### Smithery (Automatic Installation)
+
+To install Chirak for Claude Desktop automatically using Smithery:
+
+```bash
+npx -y smithery mcp add ufhouck/chirak
+```
+
+### Claude Desktop (Manual Configuration)
 
 Add the following configuration to your `claude_desktop_config.json`:
 

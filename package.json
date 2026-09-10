@@ -1,6 +1,6 @@
 {
   "name": "chirak-mcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Model Context Protocol (MCP) Server for Chirak Sales & Inventory Assistant",
   "main": "dist/index.js",
   "bin": {

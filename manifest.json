@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "chirak-mcp",
   "display_name": "Chirak Sales & Inventory Assistant",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Model Context Protocol (MCP) server for Chirak Sales, Inventory, and Order Management platform.",
   "long_description": "Connect AI assistants and autonomous agents to Chirak. Query real-time inventory levels, record sales transactions, manage products and customers, and access revenue analytics via standard Model Context Protocol over STDIO.",
   "author": {
@@ -52,5 +52,442 @@
       "default": "https://chirak.app/api/v1",
       "required": false
     }
-  }
+  },
+  "tools": [
+    {
+      "name": "get_chirak_help",
+      "description": "Returns a complete operational guide to Chirak store capabilities, operational cheat-sheet, active store context, and example AI prompt patterns. Call this whenever the user or agent needs help, guidance, or wants to explore store features.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "Optional specific topic to focus on: 'products', 'sales', 'customers', 'reports', or 'general'."
+          }
+        }
+      }
+    },
+    {
+      "name": "help",
+      "description": "Quick operational guide and cheat-sheet for Chirak store capabilities, active metrics, and recommended prompts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "Optional specific topic: 'products', 'sales', 'customers', 'reports', or 'general'."
+          }
+        }
+      }
+    },
+    {
+      "name": "get_inventory",
+      "description": "Fetch current inventory products from Chirak, with options to filter by category or find critical low stock items.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Optional category name to filter products (e.g. 'Coffee', 'Clothing', 'General')."
+          },
+          "low_stock_only": {
+            "type": "boolean",
+            "description": "If true, only returns products whose stock quantity is at or below the minimum threshold."
+          },
+          "limit": {
+            "type": "number",
+            "description": "Maximum number of products to return (default: 50, max: 100)."
+          }
+        }
+      }
+    },
+    {
+      "name": "search_product",
+      "description": "Search for products in Chirak by name, SKU code, or barcode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The search query (product name, barcode, or SKU)."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "add_product",
+      "description": "Add a new product to Chirak inventory. Use this when the user asks to add items, parse wholesale invoices, or register products.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full product title/name (required)."
+          },
+          "sellingPrice": {
+            "type": "number",
+            "description": "Retail selling price for the product (e.g. 150.0)."
+          },
+          "costPrice": {
+            "type": "number",
+            "description": "Purchase or wholesale cost price (optional, default: 0)."
+          },
+          "stockQuantity": {
+            "type": "number",
+            "description": "Initial physical stock quantity (default: 0)."
+          },
+          "minimumStock": {
+            "type": "number",
+            "description": "Low stock alert threshold (default: 5)."
+          },
+          "category": {
+            "type": "string",
+            "description": "Product category name (e.g. 'General', 'Giyim', 'Kahve')."
+          },
+          "sku": {
+            "type": "string",
+            "description": "Stock Keeping Unit code (e.g. 'GMLK-01')."
+          },
+          "barcode": {
+            "type": "string",
+            "description": "EAN-13, QR, or other barcode string."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit type: 'Adet', 'Kg', 'Gram', 'Kutu', 'Çift', 'Libre', 'Ons'."
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO currency code (e.g. 'TRY', 'USD', 'EUR')."
+          }
+        },
+        "required": [
+          "name",
+          "sellingPrice"
+        ]
+      }
+    },
+    {
+      "name": "update_product",
+      "description": "Update details of an existing product in Chirak, such as selling price, cost, physical stock quantity, name, category, SKU, or barcode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product UUID (required)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Updated product name."
+          },
+          "sellingPrice": {
+            "type": "number",
+            "description": "Updated retail selling price."
+          },
+          "costPrice": {
+            "type": "number",
+            "description": "Updated wholesale cost price."
+          },
+          "stockQuantity": {
+            "type": "number",
+            "description": "Updated stock quantity."
+          },
+          "minimumStock": {
+            "type": "number",
+            "description": "Updated minimum stock threshold."
+          },
+          "category": {
+            "type": "string",
+            "description": "Updated category name."
+          },
+          "sku": {
+            "type": "string",
+            "description": "Updated SKU code."
+          },
+          "barcode": {
+            "type": "string",
+            "description": "Updated barcode string."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Updated unit type (e.g. 'Adet', 'Kg')."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "adjust_stock",
+      "description": "Adjust physical stock quantity for a product (+/- change) with an audit reason (e.g. 'purchase', 'damage', 'adjustment', 'return'). Automatically records a stock movement.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product UUID (required)."
+          },
+          "quantityChange": {
+            "type": "number",
+            "description": "Quantity change (e.g. +10 to add stock, -3 for damaged goods)."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason: 'purchase', 'sale', 'adjustment', 'damage', 'return'."
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional audit note for the stock adjustment."
+          }
+        },
+        "required": [
+          "id",
+          "quantityChange"
+        ]
+      }
+    },
+    {
+      "name": "delete_product",
+      "description": "Permanently delete or remove a product from the Chirak inventory catalog.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product UUID to delete (required)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "record_sale",
+      "description": "Record a sale order and automatically deduct the corresponding product stocks in Chirak.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "List of items in the order.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Product name (or SKU if name not available)"
+                },
+                "sku": {
+                  "type": "string",
+                  "description": "Product SKU"
+                },
+                "productId": {
+                  "type": "string",
+                  "description": "Product UUID (if known)"
+                },
+                "quantity": {
+                  "type": "number",
+                  "description": "Quantity sold (minimum 1)"
+                },
+                "unitPrice": {
+                  "type": "number",
+                  "description": "Unit price (optional, uses product selling price if omitted)"
+                }
+              },
+              "required": [
+                "quantity"
+              ]
+            }
+          },
+          "customerName": {
+            "type": "string",
+            "description": "Customer full name (optional)."
+          },
+          "customerPhone": {
+            "type": "string",
+            "description": "Customer phone number (optional)."
+          },
+          "channel": {
+            "type": "string",
+            "description": "Sale channel: 'WhatsApp', 'Instagram', 'Fiziki Mağaza', 'Web Sitesi', 'Telefon Siparişi', 'Diğer'."
+          },
+          "paymentStatus": {
+            "type": "string",
+            "description": "Payment status: 'Ödendi', 'Ödenmedi', 'Kısmi Ödeme'."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Order notes or special delivery instructions."
+          }
+        },
+        "required": [
+          "items"
+        ]
+      }
+    },
+    {
+      "name": "cancel_sale",
+      "description": "Cancel a sale order and automatically restore the ordered item quantities back into the physical store inventory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Sale order UUID to cancel (required)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "get_sales_report",
+      "description": "Retrieve a summary report of revenue, total sales orders, units sold, and low-stock alerts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "enum": [
+              "today",
+              "this_week",
+              "this_month"
+            ],
+            "description": "Time range for the sales report (default: 'today')."
+          }
+        }
+      }
+    },
+    {
+      "name": "list_customers",
+      "description": "Retrieve customer contact directory and their lifetime spending metrics from Chirak.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "description": "Search customer by name, phone or email."
+          },
+          "limit": {
+            "type": "number",
+            "description": "Max customers to return (default: 50)."
+          }
+        }
+      }
+    },
+    {
+      "name": "add_customer",
+      "description": "Add a new customer to the Chirak store contacts directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Customer full name (required)."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Customer phone number."
+          },
+          "email": {
+            "type": "string",
+            "description": "Customer email address."
+          },
+          "address": {
+            "type": "string",
+            "description": "Customer delivery / billing address."
+          },
+          "channel": {
+            "type": "string",
+            "description": "Primary channel: 'WhatsApp', 'Instagram', 'Mağaza / Telefon', 'Telegram', 'TikTok', 'Diğer'."
+          },
+          "socialHandle": {
+            "type": "string",
+            "description": "Social media username (e.g. '@selin')."
+          },
+          "notes": {
+            "type": "string",
+            "description": "VIP notes or customer preferences."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "update_customer",
+      "description": "Update contact details, delivery address, or notes of an existing customer in Chirak.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Customer UUID (required)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Updated full name."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Updated phone number."
+          },
+          "email": {
+            "type": "string",
+            "description": "Updated email address."
+          },
+          "address": {
+            "type": "string",
+            "description": "Updated address."
+          },
+          "channel": {
+            "type": "string",
+            "description": "Updated channel."
+          },
+          "socialHandle": {
+            "type": "string",
+            "description": "Updated social handle."
+          },
+          "notes": {
+            "type": "string",
+            "description": "Updated notes."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "delete_customer",
+      "description": "Delete a customer from the Chirak store directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Customer UUID to delete (required)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    }
+  ],
+  "prompts": [
+    {
+      "name": "daily_store_briefing",
+      "description": "Retrieve today revenue, total orders, and critical low stock warnings from Chirak store.",
+      "text": "Provide a concise daily store briefing for Chirak. Query today sales report and check if any products are at or below minimum stock threshold."
+    }
+  ]
 }
