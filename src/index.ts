@@ -704,7 +704,7 @@ const TOOLS: Tool[] = [
 const server = new Server(
   {
     name: "chirak-mcp-server",
-    version: "1.2.0"
+    version: "1.2.1"
   },
   {
     capabilities: {

@@ -2,7 +2,7 @@
   "manifest_version": "0.4",
   "name": "chirak-mcp",
   "display_name": "Chirak Sales & Inventory Assistant",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Model Context Protocol (MCP) server for Chirak Sales, Inventory, and Order Management platform.",
   "long_description": "Connect AI assistants and autonomous agents to Chirak. Query real-time inventory levels, record sales transactions, manage products and customers, and access revenue analytics via standard Model Context Protocol over STDIO.",
   "author": {
