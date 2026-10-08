@@ -2,7 +2,7 @@
   "manifest_version": "0.4",
   "name": "chirak-mcp",
   "display_name": "Chirak Sales & Inventory Assistant",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Model Context Protocol (MCP) server for Chirak Sales, Inventory, and Order Management platform.",
   "long_description": "Connect AI assistants and autonomous agents to Chirak. Query real-time inventory levels, record sales transactions, manage products and customers, and access revenue analytics via standard Model Context Protocol over STDIO.",
   "author": {
@@ -116,6 +116,26 @@
     {
       "name": "delete_customer",
       "description": "Delete a customer from the Chirak store directory."
+    },
+    {
+      "name": "list_documents",
+      "description": "Retrieve invoices, receipts, return invoices, and quote documents with optional filtering by type or status."
+    },
+    {
+      "name": "get_document",
+      "description": "Fetch full details of an invoice or receipt including itemized rows, customer name, tax/VAT breakdown, and total amounts."
+    },
+    {
+      "name": "create_document",
+      "description": "Create and issue a formal invoice, sales receipt, or quote in Chirak with itemized products, customer details, tax rates, and currency."
+    },
+    {
+      "name": "delete_document",
+      "description": "Permanently delete an invoice or receipt document from Chirak store."
+    },
+    {
+      "name": "export_document_text",
+      "description": "Render a clean, formatted ASCII text/thermal receipt layout of an invoice or receipt ready for display, printing, or sending as text."
     }
   ],
   "prompts": [

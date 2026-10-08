@@ -101,6 +101,16 @@ npx -y smithery mcp add ufhouck/chirak
 | `update_customer` | Update contact information and customer notes. |
 | `delete_customer` | Remove a customer record. |
 
+### Documents & Invoices (Billing)
+
+| Tool | Description |
+|---|---|
+| `list_documents` | Retrieve invoices, receipts, return invoices, and quotes with type/status filters. |
+| `get_document` | Fetch full itemized document details, customer details, and tax/VAT calculations. |
+| `create_document` | Create and issue formal invoices, sales receipts, or quotes with line items. |
+| `delete_document` | Permanently remove an invoice or receipt record. |
+| `export_document_text` | Render formatted ASCII thermal receipt / ticket layout suitable for printing or chat display. |
+
 ## Development
 
 Clone the repository and install dependencies:

@@ -510,6 +510,193 @@ const TOOLS: Tool[] = [
         data: { type: "object", description: "Result data payload from Chirak API." }
       }
     }
+  },
+  {
+    name: "list_documents",
+    description: "Retrieve invoices, receipts, return invoices, and quote documents from Chirak store with optional filtering by type or status.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        type: {
+          type: "string",
+          description: "Optional filter by document type: 'invoice', 'receipt', 'return_invoice', 'proforma', or 'quote'."
+        },
+        status: {
+          type: "string",
+          description: "Optional filter by status: 'draft', 'issued', 'completed', or 'cancelled'."
+        },
+        sale_number: {
+          type: "string",
+          description: "Optional filter by associated order number (e.g. 'ORD-1004')."
+        },
+        limit: {
+          type: "number",
+          description: "Number of documents to return (default 50, max 100)."
+        }
+      }
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
+    }
+  },
+  {
+    name: "get_document",
+    description: "Fetch full details of an invoice or receipt including itemized rows, customer name, tax/VAT breakdown, and total amounts.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "Document UUID or Document Number (e.g. '#INV-1001', '#FIS-1540')."
+        }
+      },
+      required: ["id"]
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
+    }
+  },
+  {
+    name: "create_document",
+    description: "Create and issue a formal invoice, sales receipt, or quote in Chirak with itemized products, customer details, tax rates, and currency.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        type: {
+          type: "string",
+          description: "Document type: 'invoice' (Fatura), 'receipt' (Fiş), 'quote' (Teklif), 'proforma' (Proforma). Default is 'receipt'."
+        },
+        customer_name: {
+          type: "string",
+          description: "Customer or company title on the document."
+        },
+        items: {
+          type: "array",
+          description: "List of itemized products or services.",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "Product or item name." },
+              quantity: { type: "number", description: "Quantity sold/billed." },
+              price: { type: "number", description: "Unit price." },
+              unit: { type: "string", description: "Optional unit (e.g. 'pcs', 'kg')." }
+            },
+            required: ["name", "quantity", "price"]
+          }
+        },
+        tax_rate: {
+          type: "number",
+          description: "VAT / Tax percentage rate (e.g. 20 for 20%)."
+        },
+        tax_included: {
+          type: "boolean",
+          description: "Whether document prices/items include tax (default true for receipts, false for invoices)."
+        },
+        subtotal: {
+          type: "number",
+          description: "Optional subtotal before tax. Computed automatically if omitted."
+        },
+        tax_amount: {
+          type: "number",
+          description: "Optional tax amount. Computed automatically if omitted."
+        },
+        grand_total: {
+          type: "number",
+          description: "Total amount payable including tax."
+        },
+        currency: {
+          type: "string",
+          description: "Currency code (default 'USD', e.g. 'TRY', 'EUR')."
+        },
+        notes: {
+          type: "string",
+          description: "Optional notes, terms, or bank payment reference."
+        },
+        sale_number: {
+          type: "string",
+          description: "Optional linked order number (e.g. 'ORD-1004')."
+        },
+        status: {
+          type: "string",
+          description: "Status: 'completed', 'draft', or 'issued'. Default is 'completed'."
+        }
+      },
+      required: ["items"]
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
+    }
+  },
+  {
+    name: "delete_document",
+    description: "Permanently delete an invoice or receipt document from Chirak store.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "Document UUID to delete."
+        }
+      },
+      required: ["id"]
+    },
+    annotations: {
+      destructiveHint: true,
+      readOnlyHint: false
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
+    }
+  },
+  {
+    name: "export_document_text",
+    description: "Render a clean, formatted ASCII text/thermal receipt layout of an invoice or receipt ready for display, printing, or sending as text.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "Document UUID or Document Number."
+        }
+      },
+      required: ["id"]
+    },
+    annotations: {
+      readOnlyHint: true
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean", description: "Status of the tool execution." },
+        data: { type: "object", description: "Result data payload from Chirak API." }
+      }
+    }
   }
 ];
 
@@ -517,7 +704,7 @@ const TOOLS: Tool[] = [
 const server = new Server(
   {
     name: "chirak-mcp-server",
-    version: "1.1.0"
+    version: "1.2.0"
   },
   {
     capabilities: {
@@ -577,6 +764,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               cancel_sale: "Cancel a sale order and automatically restore products to inventory.",
               get_sales_report: "Get daily, weekly, or monthly revenue, order volume, and low stock."
             },
+            documents: {
+              list_documents: "Query invoice and receipt documents with filters.",
+              get_document: "Fetch full itemized document details and VAT/tax totals.",
+              create_document: "Create a new invoice, receipt, or quote document.",
+              delete_document: "Remove a document from store records.",
+              export_document_text: "Render a formatted text receipt ticket for display or printing."
+            },
             customers: {
               list_customers: "Search customer contacts and lifetime spend metrics.",
               add_customer: "Create new customer cards with phone, email, channel, and address.",
@@ -587,9 +781,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           recommendedAIPrompts: [
             "Bugün ne kadar ciro yaptık ve hangi ürünler azaldı?",
             "Yeni gelen faturadaki 5 ürünü stoğa ekle",
+            "Ahmet Bey için 2 adet Takım Elbise faturası kes ve fiş çıktısını ver",
+            "Son kesilen faturanın detaylarını getir",
             "Selin Yılmaz'a 2 adet İtalyan Keten Gömlek satışı gir (WhatsApp)",
-            "İtalyan Keten Gömlek satış fiyatını 95 USD yap ve stoğa 10 adet ekle",
-            "Müşteriler arasında Selin'i ara ve telefon numarasını güncelle"
+            "İtalyan Keten Gömlek satış fiyatını 95 USD yap ve stoğa 10 adet ekle"
           ]
         };
 
@@ -801,6 +996,132 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             {
               type: "text",
               text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case "list_documents": {
+        const queryParams = new URLSearchParams();
+        if (toolArgs.type) queryParams.set("type", String(toolArgs.type));
+        if (toolArgs.status) queryParams.set("status", String(toolArgs.status));
+        if (toolArgs.sale_number) queryParams.set("saleNumber", String(toolArgs.sale_number));
+        if (toolArgs.limit) queryParams.set("limit", String(toolArgs.limit));
+
+        const result = await apiRequest(`/documents?${queryParams.toString()}`);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case "get_document": {
+        const docId = String(toolArgs.id || "");
+        const result = await apiRequest(`/documents/${encodeURIComponent(docId)}`);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case "create_document": {
+        const payload = {
+          type: toolArgs.type || "receipt",
+          customerName: toolArgs.customer_name || "Walk-in Customer",
+          items: toolArgs.items || [],
+          taxRate: toolArgs.tax_rate,
+          taxIncluded: toolArgs.tax_included !== undefined ? Boolean(toolArgs.tax_included) : undefined,
+          taxAmount: toolArgs.tax_amount,
+          subtotal: toolArgs.subtotal,
+          grandTotal: toolArgs.grand_total,
+          currency: toolArgs.currency || "USD",
+          notes: toolArgs.notes || "",
+          saleNumber: toolArgs.sale_number,
+          status: toolArgs.status || "completed"
+        };
+        const result = await apiRequest("/documents", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case "delete_document": {
+        const docId = String(toolArgs.id || "");
+        const result = await apiRequest(`/documents/${encodeURIComponent(docId)}`, {
+          method: "DELETE"
+        });
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2)
+            }
+          ]
+        };
+      }
+
+      case "export_document_text": {
+        const docId = String(toolArgs.id || "");
+        const result = await apiRequest(`/documents/${encodeURIComponent(docId)}`);
+        const doc = result.document;
+        if (!doc) {
+          throw new Error(`Document '${docId}' not found.`);
+        }
+
+        const divider = "------------------------------------------";
+        const doubleDivider = "==========================================";
+        const itemsText = (doc.items || []).map((it: any) => {
+          const qty = it.quantity || 1;
+          const price = Number(it.price || 0).toLocaleString("en-US", { minimumFractionDigits: 2 });
+          const total = (qty * Number(it.price || 0)).toLocaleString("en-US", { minimumFractionDigits: 2 });
+          return `${String(it.name || "Item").padEnd(24)} ${String(qty).padStart(3)} x ${price.padStart(6)} = ${total.padStart(8)}`;
+        }).join("\n");
+
+        const receiptText = [
+          doubleDivider,
+          `           CHIRAK STORE DOCUMENT`,
+          `         ${String(doc.type || "RECEIPT").toUpperCase()}`,
+          doubleDivider,
+          `Document No : ${doc.documentNumber}`,
+          `Order No    : ${doc.saleNumber || "N/A"}`,
+          `Customer    : ${doc.customerName || "Walk-in Customer"}`,
+          `Date        : ${new Date(doc.issueDate || doc.createdAt).toLocaleString()}`,
+          `Status      : ${doc.status || "Completed"}`,
+          divider,
+          `Item                     Qty      Price     Total`,
+          divider,
+          itemsText,
+          divider,
+          `Subtotal    : ${Number(doc.subtotal || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} ${doc.currency}`,
+          `Tax/VAT     : ${Number(doc.taxAmount || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} ${doc.currency} (${doc.taxRate || 0}%)`,
+          `GRAND TOTAL : ${Number(doc.grandTotal || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })} ${doc.currency}`,
+          doubleDivider,
+          doc.notes ? `Notes: ${doc.notes}\n${divider}` : "",
+          `       Thank you for your business!`,
+          doubleDivider
+        ].filter(Boolean).join("\n");
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: receiptText
             }
           ]
         };

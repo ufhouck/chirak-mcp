@@ -1,6 +1,6 @@
 {
   "name": "chirak-mcp",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "mcpName": "io.github.ufhouck/chirak-mcp",
   "description": "Model Context Protocol (MCP) Server for Chirak Sales & Inventory Assistant",
   "main": "dist/index.js",
@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",
+    "prepublishOnly": "npm run build",
     "start": "node dist/index.js"
   },
   "repository": {
